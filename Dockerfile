@@ -49,8 +49,5 @@ COPY test_imports.py .
 # Test all imports work correctly
 RUN python test_imports.py
 
-# Expose port
-EXPOSE 7860
-
 # Run Streamlit
-CMD ["streamlit", "run", "app.py", "--server.port=7860", "--server.address=0.0.0.0"]
+CMD ["sh", "-c", "streamlit run app.py --server.port $PORT --server.address 0.0.0.0 --server.headless true --server.runOnSave false"]

@@ -1059,8 +1059,8 @@ def main():
     st.markdown(
         """
         <div style="text-align: center; color: #666; padding: 1rem;">
-            <p>Built with ❤️ | by <a href="https://github.com/iamfaham">iamfaham</a></p>
-            <p>Version: {version}</p>
+            <p>Guided for Anju Mam &hearts;</a></p>
+            <p>Group 4 </p>
         </div>
         """.format(
             version=APP_VERSION
