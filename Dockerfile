@@ -1,53 +1,76 @@
-# Use Python 3.11 slim image
+# # Use Python 3.11 slim image
+# FROM python:3.11-slim
+
+# # Set working directory
+# WORKDIR /app
+
+# # Install system dependencies for OpenCV, audio, and moviepy
+# RUN apt-get update && apt-get install -y \
+#     libgl1-mesa-glx \
+#     libglib2.0-0 \
+#     libsm6 \
+#     libxext6 \
+#     libxrender-dev \
+#     libavcodec-dev \
+#     libavformat-dev \
+#     libswscale-dev \
+#     libv4l-dev \
+#     libxvidcore-dev \
+#     libx264-dev \
+#     libjpeg-dev \
+#     libpng-dev \
+#     libtiff-dev \
+#     ffmpeg \
+#     libav-tools \
+#     && rm -rf /var/lib/apt/lists/*
+
+# # Copy requirements and install Python dependencies
+# COPY requirements.txt .
+
+# # Set environment variables to prefer pre-built wheels
+# ENV PIP_PREFER_BINARY=1
+# ENV PIP_NO_BUILD_ISOLATION=0
+
+# # Upgrade pip and install numpy first (to avoid conflicts)
+# RUN pip install --no-cache-dir --upgrade pip setuptools wheel
+# RUN pip install --no-cache-dir "numpy>=1.24.0,<2.0.0"
+
+# # Install the rest of the requirements
+# RUN pip install --no-cache-dir -r requirements.txt
+
+# # Verify moviepy installation
+# RUN python -c "import moviepy; print('MoviePy version:', moviepy.__version__)"
+
+# # Copy the app and test script
+# COPY app.py .
+# COPY simple_model_manager.py .
+# COPY test_imports.py .
+
+# # Test all imports work correctly
+# RUN python test_imports.py
+
+# # Run Streamlit
+# CMD ["sh", "-c", "streamlit run app.py --server.port $PORT --server.address 0.0.0.0 --server.headless true --server.runOnSave false"]
+
 FROM python:3.11-slim
 
-# Set working directory
 WORKDIR /app
 
-# Install system dependencies for OpenCV, audio, and moviepy
+# Install required system dependencies (balanced)
 RUN apt-get update && apt-get install -y \
-    libgl1-mesa-glx \
-    libglib2.0-0 \
-    libsm6 \
-    libxext6 \
-    libxrender-dev \
-    libavcodec-dev \
-    libavformat-dev \
-    libswscale-dev \
-    libv4l-dev \
-    libxvidcore-dev \
-    libx264-dev \
-    libjpeg-dev \
-    libpng-dev \
-    libtiff-dev \
     ffmpeg \
-    libav-tools \
+    libgl1 \
+    libglib2.0-0 \
+    portaudio19-dev \
+    python3-dev \
+    build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements and install Python dependencies
 COPY requirements.txt .
 
-# Set environment variables to prefer pre-built wheels
-ENV PIP_PREFER_BINARY=1
-ENV PIP_NO_BUILD_ISOLATION=0
-
-# Upgrade pip and install numpy first (to avoid conflicts)
 RUN pip install --no-cache-dir --upgrade pip setuptools wheel
-RUN pip install --no-cache-dir "numpy>=1.24.0,<2.0.0"
-
-# Install the rest of the requirements
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Verify moviepy installation
-RUN python -c "import moviepy; print('MoviePy version:', moviepy.__version__)"
+COPY . .
 
-# Copy the app and test script
-COPY app.py .
-COPY simple_model_manager.py .
-COPY test_imports.py .
-
-# Test all imports work correctly
-RUN python test_imports.py
-
-# Run Streamlit
-CMD ["sh", "-c", "streamlit run app.py --server.port $PORT --server.address 0.0.0.0 --server.headless true --server.runOnSave false"]
+CMD ["sh", "-c", "streamlit run app.py --server.port $PORT --server.address 0.0.0.0 --server.headless true"]
